@@ -1,34 +1,27 @@
 import React from "react";
 import classNames from "classnames";
-import "components/DayListItem.scss";
+import "components/InterviewerListItem.scss";
 
-export default function DayListItem(props) {
+export default function InterviewerListItem(props) {
 
-  function formatSpots(props) {
-    switch (props.spots) {
-      case 0: return "no spots remaining";
-      case 1: return "1 spot remaining";
-      default: return `${props.spots} spots remaining`;
-    }
+  function showName(props) { 
+    return (props.selected && <>{props.name}</>);
   }
 
-
-  let liClass = classNames('day-list__item ', {
-    'day-list__item--full': (props.spots === 0),
-    'day-list__item--selected' : props.selected
+  let liClass = classNames('interviewers__item ', {
+    'interviewers__item--selected' : props.selected
   });
-
-
 
   return (
 
-    <li className="interviewers__item">
+    <li className={liClass}
+        onClick={() => props.setInterviewer() }>
       <img
         className="interviewers__item-image"
-        src="https://i.imgur.com/LpaY82x.png"
-        alt="Sylvia Palmer"
+        src={props.avatar}
+        alt={props.name}
       />
-      Sylvia Palmer
+      {showName(props)}
     </li>
 
   );

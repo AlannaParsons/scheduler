@@ -3,6 +3,8 @@ import DayListItem from "components/DayListItem.js";
 
 export default function DayList(props) {
 
+  
+
   return (
 
     <ul>
@@ -11,9 +13,9 @@ export default function DayList(props) {
               key={day.id}
               name={day.name}
               spots={day.spots}
-              selected={day.name === props.day}
-              setDay={props.setDay}>
-        </DayListItem>
+              selected={day.name === props.value}
+              setDay={props.onChange}
+        />
       })}
     </ul>
 
