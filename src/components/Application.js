@@ -6,7 +6,10 @@ import "components/Appointment";
 import "components/Application.scss";
 import DayList from "components/DayList.js";
 import Appointment from "components/Appointment";
-import {getAppointmentsForDay, getInterview} from "../helpers/selectors.js";
+import {getAppointmentsForDay, getInterviewersForDay, getInterview} from "../helpers/selectors.js";
+
+//PROBLEM get appointments and getinterviewers running perpetually
+
 
 export default function Application(props) {
   //maybe remove?
@@ -16,6 +19,54 @@ export default function Application(props) {
     "GET_INTERVIEWERS": 'http://localhost:8001/api/interviewers'
   }
 
+  //combine book and cancel? similar
+  async function bookInterview(id, interview) {
+
+    const appointment = {
+      ...state.appointments[id],
+      interview: { ...interview }
+    };
+
+    const appointments = {
+      ...state.appointments,
+      [id]: appointment
+    };
+
+    //optomistic set state :s
+
+    let response = await axios.put(`http://localhost:8001/api/appointments/${id}`, {interview})
+    
+    setState({
+      ...state, 
+      appointments
+    }) 
+
+    return response
+  }
+
+  async function cancelInterview(id) {
+
+    
+    const appointment = {
+      ...state.appointments[id],
+      interview: null 
+    };
+
+    const appointments = {
+      ...state.appointments,
+      [id]: appointment
+    };
+
+    let response = await axios.delete(`http://localhost:8001/api/appointments/${id}`)
+    
+    setState({
+      ...state, 
+      appointments
+    }) 
+
+    return response
+  }
+
   const [state, setState] = useState({
     day: "Monday",
     days: [],
@@ -23,6 +74,7 @@ export default function Application(props) {
   });
 
   const setDay = (day) => setState({ ...state, day });
+  //const dailyAppointments = getAppointmentsForDay(state, state.day);
 
   useEffect(() => {
     Promise.all([
@@ -35,10 +87,13 @@ export default function Application(props) {
           days: all[0].data, 
           appointments: all[1].data, 
           interviewers: all[2].data 
-      }))
-    });
-  }, [state.day, calls]);
+        }))
 
+    });
+  }, [state.day]);
+
+  
+  //look into get interviewersforday. use effect? running too much
   const appointments = getAppointmentsForDay(state, state.day);
   const schedule = appointments.map((appointment) => {
     const interview = getInterview(state, appointment.interview);
@@ -48,6 +103,9 @@ export default function Application(props) {
         id={appointment.id}
         time={appointment.time}
         interview={interview}
+        interviewers={getInterviewersForDay(state, state.day)}
+        bookInterview={bookInterview}
+        cancelInterview={cancelInterview}
       />
      );
   });
