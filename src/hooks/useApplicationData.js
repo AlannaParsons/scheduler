@@ -23,20 +23,26 @@ export default function useVisualMode(initial) {
         [id]: appointment
         };
 
-        //optomistic set state :s
+        //optomistic set state :s . response unused currently
         let response = await axios.put(`http://localhost:8001/api/appointments/${id}`, {interview})
-        
-        setState({
-        ...state, 
-        appointments
-        }) 
+        //axios.put(`http://localhost:8001/api/appointments/${id}`, {interview})
+            //.then(() => {
+                let days = updateSpots(-1)
+
+
+            //})
+
+            setState({
+                ...state, 
+                appointments,
+                days
+                }) 
 
         return response
     }
 
     async function cancelInterview(id) {
 
-        
         const appointment = {
         ...state.appointments[id],
         interview: null 
@@ -48,13 +54,27 @@ export default function useVisualMode(initial) {
         };
 
         let response = await axios.delete(`http://localhost:8001/api/appointments/${id}`)
-        
-        setState({
-        ...state, 
-        appointments
-        }) 
+            //.then(() => {
+                let days = updateSpots(1)
+
+                setState({
+                ...state, 
+                appointments,
+                days
+                }) 
+            //})
 
         return response
+    }
+
+    function updateSpots(update) {
+
+        const days = [...state.days]
+        console.log('wtf',days,'STATE',state);
+        let index = days.findIndex( day => day.name === state.day ) 
+        console.log('happen:', index);
+        days[index] = {...days[index], spots: days[index].spots + update }
+        return days
     }
 
     const setDay = (day) => setState({ ...state, day });
@@ -74,7 +94,6 @@ export default function useVisualMode(initial) {
 
         });
     }, [state.day]);
-    //const dailyAppointments = getAppointmentsForDay(state, state.day);
-  
+
     return {state, setDay, bookInterview, cancelInterview}
 }
