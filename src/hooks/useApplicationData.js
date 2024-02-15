@@ -11,7 +11,7 @@ export default function useVisualMode(initial) {
         appointments: {}
       });
 
-    async function bookInterview(id, interview) {
+    async function bookInterview(id, interview, edit) {
 
         const appointment = {
         ...state.appointments[id],
@@ -24,19 +24,14 @@ export default function useVisualMode(initial) {
         };
 
         //optomistic set state :s . response unused currently
-        let response = await axios.put(`http://localhost:8001/api/appointments/${id}`, {interview})
-        //axios.put(`http://localhost:8001/api/appointments/${id}`, {interview})
-            //.then(() => {
-                let days = updateSpots(-1)
+        const response = await axios.put(`http://localhost:8001/api/appointments/${id}`, {interview})
+        const days = edit ? updateSpots(0) : updateSpots(-1);
 
-
-            //})
-
-            setState({
-                ...state, 
-                appointments,
-                days
-                }) 
+        setState({
+            ...state, 
+            appointments,
+            days
+        }) 
 
         return response
     }
@@ -53,26 +48,21 @@ export default function useVisualMode(initial) {
         [id]: appointment
         };
 
-        let response = await axios.delete(`http://localhost:8001/api/appointments/${id}`)
-            //.then(() => {
-                let days = updateSpots(1)
+        const response = await axios.delete(`http://localhost:8001/api/appointments/${id}`)
+        const days = updateSpots(1);
 
-                setState({
-                ...state, 
-                appointments,
-                days
-                }) 
-            //})
+        setState({
+        ...state, 
+        appointments,
+        days
+        }) 
 
         return response
     }
 
     function updateSpots(update) {
-
         const days = [...state.days]
-        console.log('wtf',days,'STATE',state);
-        let index = days.findIndex( day => day.name === state.day ) 
-        console.log('happen:', index);
+        const index = days.findIndex( day => day.name === state.day ) 
         days[index] = {...days[index], spots: days[index].spots + update }
         return days
     }

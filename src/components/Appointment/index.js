@@ -23,15 +23,7 @@ const ERROR_DELETE = "ERROR_DELETE";
 export default function Appointment(props) {
 
     async function save(name, interviewer) {
-        // transition(SAVING);
-        // const interview = {
-        //   student: name,
-        //   interviewer
-        // };
-        // //eventual check?? 
-        // let something = await props.bookInterview(props.id, interview)
-        
-        // transition(SHOW);
+
         const interview = {
             student: name,
             interviewer
@@ -40,21 +32,11 @@ export default function Appointment(props) {
         transition(SAVING, true);
 
         props
-            .bookInterview(props.id, interview)
+            .bookInterview(props.id, interview, mode === EDIT)
             .then(() => transition(SHOW))
-            .catch(error => {
-                console.log(error)
-                transition(ERROR_SAVE, true)
+            .catch(error => { transition(ERROR_SAVE, true)
             });
     }
-
-
-    //deletes appointment and makes new. better implimentation?
-    // async function edit() {
-    //     transition(EDIT);
-
-
-    // }
 
     function destroy(event) {
         transition(DELETING, true);
@@ -69,7 +51,7 @@ export default function Appointment(props) {
     );
 
     return (
-        <article className="appointment">
+        <article className="appointment" data-testid="appointment">
             <Header
                 time = {props.time}
             />
